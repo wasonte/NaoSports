@@ -35,7 +35,7 @@ public class RobotSession {
     }
 
     // Game elements
-    String user;
+    String playerName;
     int score;
 
 
@@ -71,9 +71,9 @@ public class RobotSession {
     //
     ////////////////////
 
-    public void startServiceRoutine(String ip, String user) throws Exception {
+    public void startServiceRoutine(String ip, String playerName) throws Exception {
         this.ip = ip;
-        this.user = user;
+        this.playerName = playerName;
         session = new Session();
 
 
@@ -321,6 +321,10 @@ public class RobotSession {
     //
     ////////////////////
 
+
+    public String getPlayerName() {
+        return playerName;
+    }
 
     public boolean isSubscribedToRedBall() {
         return subscribedToRedBall;

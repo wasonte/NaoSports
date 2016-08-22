@@ -34,22 +34,22 @@ import java.io.File;
 public class MainActivity extends AppCompatActivity implements
         SensorEventListener {
 
-    private static final int THIRTYMINMATCH = 1800*1000;
-    private static final int FIFTEENMINMATCH = 900*1000;
-    private static final int FIVEMINMATCH = 300*1000;
-    private static final int ONEMINMATCH = 70*1000;
     private static final String TIMEFORMAT = "%02d:%02d";
 
     private static final String TAG = "MainActivity";
 
     private Context context;
 
-    private EditText ip;
     private Switch headMovement;
     private Switch trackBallSwitch;
     private FrameLayout scoreTable;
+
     private LinearLayout timerLayout;
     private TextView timerTextView;
+
+    private TextView textViewPlayerName;
+    private LinearLayout linearLayoutPlayer2Score;
+    private ImageView imageViewVS;
 
     private SensorManager mgr=null;
     private float movementX;
@@ -66,12 +66,17 @@ public class MainActivity extends AppCompatActivity implements
         setContentView(R.layout.activity_main);
         context = this;
 
+        // Necesary to run the robot
+        EmbeddedTools ebt = new EmbeddedTools();
+        File cacheDir = getApplicationContext().getCacheDir();
+        ebt.overrideTempDirectory(cacheDir);
+        ebt.loadEmbeddedLibraries();
+
+        // Toolbar
         Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
         setSupportActionBar(myToolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
-
-        ip = (EditText) findViewById(R.id.robot_ip_edit);
         timerLayout = (LinearLayout)findViewById(R.id.timerLayout);
         timerTextView = (TextView) findViewById(R.id.timer_text_view);
         headMovement = (Switch) findViewById(R.id.headMovementSwitch);
@@ -80,12 +85,18 @@ public class MainActivity extends AppCompatActivity implements
 
         scoreTable = (FrameLayout)findViewById(R.id.score_frame);
 
-        // Necesary to run the robot
-        EmbeddedTools ebt = new EmbeddedTools();
-        File cacheDir = getApplicationContext().getCacheDir();
-        ebt.overrideTempDirectory(cacheDir);
-        ebt.loadEmbeddedLibraries();
+        textViewPlayerName = (TextView)findViewById(R.id.textview_playername);
+        textViewPlayerName.setText(RobotSession.getInstance().getPlayerName());
 
+        imageViewVS = (ImageView)findViewById(R.id.vs_image);
+        linearLayoutPlayer2Score = (LinearLayout)findViewById(R.id.player2_score);
+
+        if (getIntent().getStringExtra("mode").equals("versus")){
+            imageViewVS.setVisibility(View.VISIBLE);
+            linearLayoutPlayer2Score.setVisibility(View.VISIBLE);
+        }
+
+        // Robot controllers
         handler = new Handler();
         mgr=(SensorManager)getSystemService(Context.SENSOR_SERVICE);
 
@@ -111,28 +122,8 @@ public class MainActivity extends AppCompatActivity implements
             }
         });
 
-        timer = new CountDownTimer(ONEMINMATCH,1000) {
-            @Override
-            public void onTick(long millisUntilFinished) {
-                long minute = millisUntilFinished / (60 * 1000);
-                long second = (millisUntilFinished / 1000) % 60;
-                timerTextView.setText("" + String.format(TIMEFORMAT,
-                        minute,
-                        second));
-
-                if (minute == 1 && second == 0){
-                    timerLayout.setBackground(getDrawable(R.drawable.timer_warning));
-                } else if (minute == 1 && second == 5){
-                    timerLayout.setBackground(getDrawable(R.drawable.timer_caution));
-                }
-            }
-
-            @Override
-            public void onFinish() {
-                timerTextView.setText("00:00");
-                Toast.makeText(context, "Final", Toast.LENGTH_SHORT).show();
-            }
-        }.start();
+        initiazeVideo();
+        initiazeTimer();
     }
 
     @Override
@@ -185,58 +176,64 @@ public class MainActivity extends AppCompatActivity implements
 
     ////////////////////
     //
-    // Initialize singleton
+    // Video Image and timer
     //
     ////////////////////
-    public void connect(View view) {
+    public void initiazeVideo() {
         Thread routine = new Thread(new Runnable() {
             @Override
             public void run() {
                 Looper.prepare();
-                if (ip.getText() != null && !ip.getText().toString().equals("")) {
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            image.setImageBitmap(RobotSession.getInstance().getVideo());
+                            handler.postDelayed(this, 20);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
 
-                    try {
-                        // Initialize robot
-                        RobotSession.getInstance().startServiceRoutine(ip.getText().toString(),"George");
-                    } catch (Exception e){
-                        e.printStackTrace();
-                        Log.e(TAG, "Connection Error", e);
                     }
-
-                    handler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            try {
-                                image.setImageBitmap(RobotSession.getInstance().getVideo());
-                                handler.postDelayed(this, 20);
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
-
-                        }
-                    });
-
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            headMovement.setEnabled(true);
-                            trackBallSwitch.setEnabled(true);
-                            unRegisterHeadMovementManager();
-                        }
-                    });
-
-                } else {
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Toast.makeText(context, "Please enter a robot ip or a robot name", Toast.LENGTH_SHORT).show();
-                        }
-                    });
-                }
+                });
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        headMovement.setEnabled(true);
+                        trackBallSwitch.setEnabled(true);
+                        unRegisterHeadMovementManager();
+                    }
+                });
             }
         });
         routine.start();
     }
+
+    public void initiazeTimer() {
+        timer = new CountDownTimer(getIntent().getIntExtra("gameDuration", 185*1000),1000) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+                long minute = millisUntilFinished / (60 * 1000);
+                long second = (millisUntilFinished / 1000) % 60;
+                timerTextView.setText("" + String.format(TIMEFORMAT,
+                        minute,
+                        second));
+
+                if (minute == 1 && second == 0){
+                    timerLayout.setBackground(getDrawable(R.drawable.timer_warning));
+                } else if (minute == 3 && second == 0){
+                    timerLayout.setBackground(getDrawable(R.drawable.timer_caution));
+                }
+            }
+
+            @Override
+            public void onFinish() {
+                timerTextView.setText("00:00");
+                Toast.makeText(context, "Final", Toast.LENGTH_SHORT).show();
+            }
+        }.start();
+    }
+
 
     ////////////////////
     //

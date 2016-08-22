@@ -73,9 +73,9 @@
                 android:orientation="vertical">
 
                 <TextView
+                    android:id="@+id/textview_playername"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="wasonte"
                     android:layout_gravity="center"
                     android:textStyle="bold"
                     android:textSize="10sp"/>
@@ -98,7 +98,8 @@
                 android:layout_centerVertical="true"
                 android:layout_marginLeft="5dp"
                 android:layout_marginRight="5dp"
-                android:src="@drawable/vs"/>
+                android:src="@drawable/vs"
+                android:visibility="gone"/>
 
             <LinearLayout
                 android:id="@+id/player2_score"
@@ -107,7 +108,8 @@
                 android:layout_centerVertical="true"
                 android:layout_toRightOf="@id/vs_image"
                 android:background="@drawable/score_user"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:visibility="gone">
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -129,34 +131,19 @@
         </RelativeLayout>
     </android.support.v7.widget.Toolbar>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:orientation="horizontal"
-        android:weightSum="3"
-        android:layout_height="wrap_content"
-        android:id="@+id/robot_ip_layout"
-        android:layout_below="@id/my_toolbar">
-        <EditText
-            android:layout_width="0dp"
-            android:id="@+id/robot_ip_edit"
-            android:layout_weight="2"
-            android:layout_height="wrap_content"
-            android:text="192.168.1.113"
-            android:hint="Robot Ip"/>
-        <Button
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:onClick="connect"
-            android:layout_height="wrap_content"
-            android:text="Connect"/>
-
-    </LinearLayout>
-
     <ImageView
         android:layout_width="1100px"
         android:layout_height="900px"
         android:id="@+id/image_view"
-        android:layout_below="@id/robot_ip_layout"/>
+        android:layout_below="@id/my_toolbar"
+        android:layout_marginTop="-16dp" />
+    
+    <View
+        android:layout_below="@id/image_view"
+        android:layout_width="match_parent"
+        android:layout_height="6dp"
+        android:background="@color/colorAccent"
+        android:layout_marginTop="-16dp"></View>
 
     <Switch
         android:layout_width="wrap_content"

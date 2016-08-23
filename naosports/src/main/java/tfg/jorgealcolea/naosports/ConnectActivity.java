@@ -2,10 +2,13 @@ package tfg.jorgealcolea.naosports;
 
 
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.Looper;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -41,7 +44,6 @@ public class ConnectActivity extends AppCompatActivity {
     Button buttonPlay;
     Spinner timeSpinner;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -71,17 +73,25 @@ public class ConnectActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                if (editTextPlayerName.getText().toString().equals("")){
+                if (editTextPlayerName.getText().toString().equals("")) {
                     Toast.makeText(context, "Wrong player name", Toast.LENGTH_SHORT).show();
                     return;
-                } else if (editTextIp.getText().toString().equals("")){
+                } else if (editTextIp.getText().toString().equals("")) {
                     Toast.makeText(context, "Wrong IP", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                progress = ProgressDialog.show(context, null, "Connecting to robot", true);
-                connectToRobot();
+                if (MyGcmManager.getInstance().getRegisteredInGCM()) {
+                    progress = ProgressDialog.show(context, null, "Connecting to robot", true);
+                    connectToRobot();
+                } else {
+                    Toast.makeText(context, "Not registered in GCM, restart application", Toast.LENGTH_SHORT).show();
+                }
+
             }
         });
+
+        // Register in GCM
+        MyGcmManager.getInstance().registerGCM(this, true);
     }
 
     public void connectToRobot() {

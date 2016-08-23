@@ -1,8 +1,11 @@
 package tfg.jorgealcolea.naosports;
 
 import android.app.AlertDialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -10,6 +13,7 @@ import android.hardware.SensorManager;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.Looper;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -51,6 +55,9 @@ public class MainActivity extends AppCompatActivity implements
     private LinearLayout linearLayoutPlayer2Score;
     private ImageView imageViewVS;
 
+    private TextView scorePlayerTextView;
+    private TextView scoreRivalTextView;
+
     private SensorManager mgr=null;
     private float movementX;
     private float movementY;
@@ -59,6 +66,8 @@ public class MainActivity extends AppCompatActivity implements
     private ImageView image;
 
     private CountDownTimer timer;
+
+    private BroadcastReceiver mNotificationBroadcastReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,6 +96,9 @@ public class MainActivity extends AppCompatActivity implements
 
         textViewPlayerName = (TextView)findViewById(R.id.textview_playername);
         textViewPlayerName.setText(RobotSession.getInstance().getPlayerName());
+
+        scorePlayerTextView = (TextView)findViewById(R.id.score_player_textview);
+        scoreRivalTextView = (TextView)findViewById(R.id.score_rival_textview);
 
         imageViewVS = (ImageView)findViewById(R.id.vs_image);
         linearLayoutPlayer2Score = (LinearLayout)findViewById(R.id.player2_score);
@@ -122,6 +134,7 @@ public class MainActivity extends AppCompatActivity implements
             }
         });
 
+        initializeReceiver();
         initiazeVideo();
         initiazeTimer();
     }
@@ -130,6 +143,7 @@ public class MainActivity extends AppCompatActivity implements
     protected void onPause(){
         unRegisterHeadMovementManager();
         RobotSession.getInstance().unRegisterBallTracker();
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mNotificationBroadcastReceiver);
         super.onPause();
     }
 
@@ -143,6 +157,8 @@ public class MainActivity extends AppCompatActivity implements
                 RobotSession.getInstance().registerBallTracker();
             }
         }
+        LocalBroadcastManager.getInstance(this).registerReceiver(mNotificationBroadcastReceiver,
+                new IntentFilter(MyGcmManager.GCM_NOTIFICATION));
     }
 
     @Override
@@ -232,6 +248,15 @@ public class MainActivity extends AppCompatActivity implements
                 Toast.makeText(context, "Final", Toast.LENGTH_SHORT).show();
             }
         }.start();
+    }
+
+    public void initializeReceiver(){
+        mNotificationBroadcastReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                scorePlayerTextView.setText("3");
+            }
+        };
     }
 
 

@@ -1,1 +1,1 @@
-include ':naosports'
+include ':naosports', ':gcmsender'

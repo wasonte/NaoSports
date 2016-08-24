@@ -38,6 +38,8 @@ public class RobotSession {
     String playerName;
     int score;
 
+    String mode;
+
 
     // Nao elements
     public static final String HeadYaw = "HeadYaw";
@@ -71,9 +73,10 @@ public class RobotSession {
     //
     ////////////////////
 
-    public void startServiceRoutine(String ip, String playerName) throws Exception {
+    public void startServiceRoutine(String ip, String playerName, boolean mode) throws Exception {
         this.ip = ip;
         this.playerName = playerName;
+        this.mode = (mode)?"versus":"solo";
         session = new Session();
 
 
@@ -336,5 +339,9 @@ public class RobotSession {
 
     public Boolean isAlMotion() {
         return (alMotion != null)?true:false;
+    }
+
+    public String getMode() {
+        return mode;
     }
 }

@@ -254,7 +254,16 @@ public class MainActivity extends AppCompatActivity implements
         mNotificationBroadcastReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                scorePlayerTextView.setText("3");
+
+                if (RobotSession.getInstance().getMode().equals("solo")){
+                    scorePlayerTextView.setText(intent.getStringExtra("playerScore"));
+                    Toast.makeText(context, "GOOOOOOOOOOOOOOOOOOL", Toast.LENGTH_SHORT).show();
+                } else {
+
+                }
+
+
+
             }
         };
     }

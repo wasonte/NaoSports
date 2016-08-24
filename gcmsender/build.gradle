@@ -4,10 +4,13 @@ mainClassName = "gcm.play.android.samples.com.gcmsender.GcmSender"
 
 run {
     def params = []
-    if (project.hasProperty('msg')) {
-        params.add(project.msg)
-        if (project.hasProperty('to')) {
-            params.add(project.to)
+    if (project.hasProperty('action')) {
+        params.add(project.action)
+        if (project.hasProperty('player')) {
+            params.add(project.player)
+        }
+        if (project.hasProperty('rival')) {
+            params.add(project.rival)
         }
     }
     args params

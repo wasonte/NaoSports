@@ -105,7 +105,8 @@ public class ConnectActivity extends AppCompatActivity {
                         // Initialize robot
                         RobotSession.getInstance().startServiceRoutine(
                                 editTextIp.getText().toString(),
-                                editTextPlayerName.getText().toString());
+                                editTextPlayerName.getText().toString(),
+                                toggleMode.isChecked());
                         goToGame();
                     } catch (Exception e){
                         e.printStackTrace();

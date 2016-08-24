@@ -24,6 +24,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 // NOTE:
 // This class emulates a server for the purposes of this sample,
@@ -35,37 +37,73 @@ public class GcmSender {
 
     public static final String API_KEY = "AIzaSyBK1uR_FSBXHh6n-iE_himhz47buZVVI7g";
 
+    public static String playerToken;
+    public static String rivalToken;
+    public static String mode;
+
     public static void main(String[] args) {
-        if (args.length < 1 || args.length > 2 || args[0] == null) {
-            System.err.println("usage: ./gradlew run -Pmsg=\"MESSAGE\" [-Pto=\"DEVICE_TOKEN\"]");
-            System.err.println("");
-            System.err.println("Specify a test message to broadcast via GCM. If a device's GCM registration token is\n" +
-                    "specified, the message will only be sent to that device. Otherwise, the message \n" +
-                    "will be sent to all devices subscribed to the \"global\" topic.");
-            System.err.println("");
-            System.err.println("Example (Broadcast):\n" +
-                    "On Windows:   .\\gradlew.bat run -Pmsg=\"<Your_Message>\"\n" +
-                    "On Linux/Mac: ./gradlew run -Pmsg=\"<Your_Message>\"");
-            System.err.println("");
-            System.err.println("Example (Unicast):\n" +
-                    "On Windows:   .\\gradlew.bat run -Pmsg=\"<Your_Message>\" -Pto=\"<Your_Token>\"\n" +
-                    "On Linux/Mac: ./gradlew run -Pmsg=\"<Your_Message>\" -Pto=\"<Your_Token>\"");
+
+        // TODO this fields should be setted by the clients
+        playerToken = "fv3H7A4KzkQ:APA91bHFs3H4ezmD9_yoMxZCGq-67RyEtplo5Ry95pJZ5DQ7l0MTin8Hp-ed7sAuZkVQ7A1-AMm9MiVRrinTc_DxicJcjoKTMdb4_jqLKdP8vDG8X31LnvJV0PRUu3vh2kegfWLl56R0";
+        rivalToken  = "";
+        mode = "solo";
+
+        if (args.length < 1) {
             System.exit(1);
         }
-        try {
-            // Prepare JSON containing the GCM message content. What to send and where to send.
-            JSONObject jGcmData = new JSONObject();
-            JSONObject jData = new JSONObject();
-            jData.put("message", args[0].trim());
-            // Where to send GCM message.
-            if (args.length > 1 && args[1] != null) {
-                jGcmData.put("to", args[1].trim());
-            } else {
-                jGcmData.put("to", "/topics/global");
-            }
-            // What to send in GCM message.
-            jGcmData.put("data", jData);
 
+        if (mode.equals("solo") && args.length > 2){
+            System.exit(1);
+        }
+
+        if(mode.equals("versus") && args[0].trim().equals("start") && args.length > 1){
+            System.exit(1);
+        } else if (mode.equals("versus") && args[0].trim().equals("score") && args.length != 3){
+            System.exit(1);
+        }
+
+
+        /*
+
+        { "data": {
+                "score": "5x1",
+                "time": "15:10"
+            },
+            "registration_ids": ["4", "8", ...]
+        }
+
+         */
+
+        //What to send
+        JSONObject jData = new JSONObject();
+
+        // Where to send
+        JSONObject jGcmData = new JSONObject();
+        List<String> idList = new ArrayList<>();
+
+        if (mode.equals("solo")){
+            jData.put("action", "score");
+            jData.put("playerScore", args[1].trim());
+            idList.add(playerToken);
+        } else {
+            if (args[0].equals("start")){
+                jData.put("action", "start");
+            } else if(args[0].equals("score")){
+                jData.put("action", "score");
+                jData.put("playerScore", args[1].trim());
+                jData.put("rivalScore", args[2].trim());
+            }
+            idList.add(playerToken);
+            idList.add(rivalToken);
+        }
+        jGcmData.put("data", jData);
+        jGcmData.put("registration_ids", idList);
+
+        sendPushNotification(jGcmData);
+    }
+
+    public static void sendPushNotification(JSONObject gcmData){
+        try {
             // Create connection to send GCM Message request.
             URL url = new URL("https://android.googleapis.com/gcm/send");
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -76,7 +114,7 @@ public class GcmSender {
 
             // Send GCM message content.
             OutputStream outputStream = conn.getOutputStream();
-            outputStream.write(jGcmData.toString().getBytes());
+            outputStream.write(gcmData.toString().getBytes());
 
             // Read GCM response.
             InputStream inputStream = conn.getInputStream();

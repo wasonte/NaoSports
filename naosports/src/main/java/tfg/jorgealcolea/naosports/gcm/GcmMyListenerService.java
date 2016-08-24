@@ -8,6 +8,7 @@ import android.util.Log;
 import com.google.android.gms.gcm.GcmListenerService;
 
 import tfg.jorgealcolea.naosports.MyGcmManager;
+import tfg.jorgealcolea.naosports.RobotSession;
 
 /**
  * Created by george on 23/08/16.
@@ -25,16 +26,16 @@ public class GcmMyListenerService extends GcmListenerService {
      */
     @Override
     public void onMessageReceived(String from, Bundle data) {
-        String message = data.getString("message");
+        String action = data.getString("action");
         Log.d(TAG, "From: " + from);
-        Log.d(TAG, "Message: " + message);
+        Log.d(TAG, "action: " + action);
 
-        // Process different notifications if needed
-        //sendNotification(message);
-
-        // TODO Actualizar marcadores
-        Intent updateScore = new Intent(MyGcmManager.GCM_NOTIFICATION);
-        LocalBroadcastManager.getInstance(this).sendBroadcast(updateScore);
-        // TODO 2 sincronizar dispositivos para modo versus
+        Intent intent = new Intent(MyGcmManager.GCM_NOTIFICATION);
+        if (RobotSession.getInstance().getMode().equals("solo")){
+            intent.putExtra("playerScore", data.getString("playerScore"));
+        } else {
+            // Versus mode
+        }
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 }

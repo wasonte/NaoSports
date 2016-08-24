@@ -2,13 +2,10 @@ package tfg.jorgealcolea.naosports;
 
 
 import android.app.ProgressDialog;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.Looper;
-import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -38,8 +35,8 @@ public class ConnectActivity extends AppCompatActivity {
     ProgressDialog progress;
     EditText editTextPlayerName;
     EditText editTextIp;
-    EditText editTextRivalIp;
-    LinearLayout layoutRivalRobotIp;
+    EditText editTextRivalName;
+    LinearLayout layoutRivalName;
     ToggleButton toggleMode;
     Button buttonPlay;
     Spinner timeSpinner;
@@ -51,20 +48,21 @@ public class ConnectActivity extends AppCompatActivity {
         context = this;
 
         toggleMode = (ToggleButton)findViewById(R.id.toggle_mode);
-        layoutRivalRobotIp = (LinearLayout)findViewById(R.id.layout_rival_robot_ip);
+        layoutRivalName = (LinearLayout)findViewById(R.id.layout_rival_name);
         buttonPlay = (Button)findViewById(R.id.button_play);
         editTextPlayerName = (EditText)findViewById(R.id.edittext_player_name);
         editTextIp = (EditText)findViewById(R.id.edittext_ip);
-        editTextRivalIp = (EditText)findViewById(R.id.edittext_rival_ip);
+        // TODO de momento no hago nada con la ip del rival
+        editTextRivalName = (EditText)findViewById(R.id.edittext_rival_name);
         timeSpinner = (Spinner)findViewById(R.id.time_spinner);
 
         toggleMode.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked){
-                    layoutRivalRobotIp.setVisibility(View.VISIBLE);
+                    layoutRivalName.setVisibility(View.VISIBLE);
                 } else {
-                    layoutRivalRobotIp.setVisibility(View.GONE);
+                    layoutRivalName.setVisibility(View.GONE);
                 }
             }
         });
@@ -80,6 +78,15 @@ public class ConnectActivity extends AppCompatActivity {
                     Toast.makeText(context, "Wrong IP", Toast.LENGTH_SHORT).show();
                     return;
                 }
+                if (toggleMode.isChecked()){
+                    if (editTextRivalName.getText().toString().equals("")) {
+                        Toast.makeText(context, "Wrong rival name", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                }
+
+                // TODO manejar el modo versus
+
                 if (MyGcmManager.getInstance().getRegisteredInGCM()) {
                     progress = ProgressDialog.show(context, null, "Connecting to robot", true);
                     connectToRobot();
@@ -131,12 +138,6 @@ public class ConnectActivity extends AppCompatActivity {
         getGameDuration(timeSpinner.getSelectedItemPosition());
 
         Intent intent = new Intent(context, MainActivity.class);
-        if (toggleMode.isChecked()){
-            intent.putExtra("mode", "versus");
-            intent.putExtra("rivalIp", editTextRivalIp.getText().toString());
-        } else {
-            intent.putExtra("mode", "solo");
-        }
         intent.putExtra("gameDuration", getGameDuration(timeSpinner.getSelectedItemPosition()));
         startActivity(intent);
     }

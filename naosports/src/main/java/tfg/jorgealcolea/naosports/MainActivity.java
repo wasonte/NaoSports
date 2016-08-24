@@ -103,7 +103,7 @@ public class MainActivity extends AppCompatActivity implements
         imageViewVS = (ImageView)findViewById(R.id.vs_image);
         linearLayoutPlayer2Score = (LinearLayout)findViewById(R.id.player2_score);
 
-        if (getIntent().getStringExtra("mode").equals("versus")){
+        if (RobotSession.getInstance().getMode().equals("versus")){
             imageViewVS.setVisibility(View.VISIBLE);
             linearLayoutPlayer2Score.setVisibility(View.VISIBLE);
         }
@@ -255,11 +255,15 @@ public class MainActivity extends AppCompatActivity implements
             @Override
             public void onReceive(Context context, Intent intent) {
 
+                // TODO controlar el modo versus
                 if (RobotSession.getInstance().getMode().equals("solo")){
                     scorePlayerTextView.setText(intent.getStringExtra("playerScore"));
                     Toast.makeText(context, "GOOOOOOOOOOOOOOOOOOL", Toast.LENGTH_SHORT).show();
                 } else {
-
+                    // Versus mode
+                    scorePlayerTextView.setText(intent.getStringExtra("playerScore"));
+                    scoreRivalTextView.setText(intent.getStringExtra("rivalScore"));
+                    Toast.makeText(context, "GOOOOOOOOOOOOOOOOOOL", Toast.LENGTH_SHORT).show();
                 }
 
 

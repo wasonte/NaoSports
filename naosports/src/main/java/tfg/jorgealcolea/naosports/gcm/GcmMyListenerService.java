@@ -35,6 +35,8 @@ public class GcmMyListenerService extends GcmListenerService {
             intent.putExtra("playerScore", data.getString("playerScore"));
         } else {
             // Versus mode
+            intent.putExtra("playerScore", data.getString("playerScore"));
+            intent.putExtra("rivalScore", data.getString("rivalScore"));
         }
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }

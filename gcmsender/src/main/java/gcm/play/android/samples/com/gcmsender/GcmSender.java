@@ -46,7 +46,8 @@ public class GcmSender {
         // TODO this fields should be setted by the clients
         playerToken = "fv3H7A4KzkQ:APA91bHFs3H4ezmD9_yoMxZCGq-67RyEtplo5Ry95pJZ5DQ7l0MTin8Hp-ed7sAuZkVQ7A1-AMm9MiVRrinTc_DxicJcjoKTMdb4_jqLKdP8vDG8X31LnvJV0PRUu3vh2kegfWLl56R0";
         rivalToken  = "";
-        mode = "solo";
+        //mode = "solo";
+        mode = "versus";
 
         if (args.length < 1) {
             System.exit(1);
@@ -72,24 +73,27 @@ public class GcmSender {
             "registration_ids": ["4", "8", ...]
         }
 
+
+        ///////// Script exameples
+        ./gradlew run -Paction="start"
+        ./gradlew run -Paction="score" -Pplayer="3"
+        ./gradlew run -Paction="score" -Pplayer="3" -Prival="1"
+
          */
 
         //What to send
         JSONObject jData = new JSONObject();
+        jData.put("action", args[0].trim());
 
         // Where to send
         JSONObject jGcmData = new JSONObject();
         List<String> idList = new ArrayList<>();
 
         if (mode.equals("solo")){
-            jData.put("action", "score");
             jData.put("playerScore", args[1].trim());
             idList.add(playerToken);
         } else {
-            if (args[0].equals("start")){
-                jData.put("action", "start");
-            } else if(args[0].equals("score")){
-                jData.put("action", "score");
+            if(args[0].equals("score")){
                 jData.put("playerScore", args[1].trim());
                 jData.put("rivalScore", args[2].trim());
             }

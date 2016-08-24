@@ -36,7 +36,10 @@ public class RobotSession {
 
     // Game elements
     String playerName;
+    String rivalName;
     int score;
+
+
 
     String mode;
 
@@ -343,5 +346,9 @@ public class RobotSession {
 
     public String getMode() {
         return mode;
+    }
+
+    public String getRivalName() {
+        return rivalName;
     }
 }

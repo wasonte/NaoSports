@@ -35,13 +35,13 @@ public class RobotSession {
     }
 
     // Game elements
-    String playerName;
-    String rivalName;
-    int score;
+    private String playerName;
+    private String rivalName;
 
+    private int playerScore;
+    private int rivalScore;
 
-
-    String mode;
+    private String mode;
 
 
     // Nao elements
@@ -359,4 +359,19 @@ public class RobotSession {
         this.rivalName = rivalName;
     }
 
+    public int getRivalScore() {
+        return rivalScore;
+    }
+
+    public void setRivalScore(int rivalScore) {
+        this.rivalScore = rivalScore;
+    }
+
+    public int getPlayerScore() {
+        return playerScore;
+    }
+
+    public void setPlayerScore(int playerScore) {
+        this.playerScore = playerScore;
+    }
 }

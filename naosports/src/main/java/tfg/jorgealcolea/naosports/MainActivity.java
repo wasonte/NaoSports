@@ -1,6 +1,7 @@
 package tfg.jorgealcolea.naosports;
 
 import android.app.AlertDialog;
+import android.app.Fragment;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -17,18 +18,18 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.CompoundButton;
-import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import tfg.jorgealcolea.naosports.fragments.ResultFragment;
 import tfg.jorgealcolea.naosports.fragments.ScoreListFragment;
 
 import com.aldebaran.qi.EmbeddedTools;
@@ -93,7 +94,7 @@ public class MainActivity extends AppCompatActivity implements
         trackBallSwitch = (Switch) findViewById(R.id.trackBallSwitch);
         image = (ImageView) findViewById(R.id.image_view);
 
-        scoreTable = (FrameLayout)findViewById(R.id.score_frame);
+        scoreTable = (FrameLayout)findViewById(R.id.fragment_frame);
 
         textViewPlayerName = (TextView)findViewById(R.id.textview_playername);
         textViewPlayerName.setText(RobotSession.getInstance().getPlayerName());
@@ -179,9 +180,10 @@ public class MainActivity extends AppCompatActivity implements
 
     public void onBackPressed() {
 
-        if (scoreTable.getVisibility() == View.VISIBLE){
+        if (scoreTable.getVisibility() == View.VISIBLE && timerTextView.getText().toString() == "00:00") {
+            finish();
+        } else if (scoreTable.getVisibility() == View.VISIBLE){
             scoreTable.setVisibility(View.GONE);
-
         } else {
             new AlertDialog.Builder(this)
                     .setTitle("Really Exit?")
@@ -236,7 +238,7 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     public void initiazeTimer() {
-        timer = new CountDownTimer(getIntent().getIntExtra("gameDuration", 185*1000),1000) {
+        timer = new CountDownTimer(getIntent().getIntExtra("gameDuration", 5*1000),1000) {
             @Override
             public void onTick(long millisUntilFinished) {
                 long minute = millisUntilFinished / (60 * 1000);
@@ -255,7 +257,12 @@ public class MainActivity extends AppCompatActivity implements
             @Override
             public void onFinish() {
                 timerTextView.setText("00:00");
-                Toast.makeText(context, "Final", Toast.LENGTH_SHORT).show();
+                RobotSession.getInstance().setPlayerScore(Integer.parseInt(scorePlayerTextView.getText().toString()));
+                if (RobotSession.getInstance().getMode().equals("versus")){
+                    RobotSession.getInstance().setRivalScore(Integer.parseInt(scoreRivalTextView.getText().toString()));
+                }
+                setContentFragment(new ResultFragment());
+                scoreTable.setVisibility(View.VISIBLE);
             }
         }.start();
     }
@@ -382,12 +389,10 @@ public class MainActivity extends AppCompatActivity implements
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_score:
-                setContentFragment();
+                setContentFragment(new ScoreListFragment());
                 scoreTable.setVisibility(View.VISIBLE);
                 return true;
             case R.id.action_settings:
-                Toast toast = Toast.makeText(this, "Hola puta", Toast.LENGTH_SHORT);
-                toast.show();
                 return true;
             default:
                 // If we got here, the user's action was not recognized.
@@ -397,12 +402,10 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
-    public void setContentFragment(){
-        if (getFragmentManager().findFragmentById(R.id.score_frame) == null) {
-            getFragmentManager().
-                    beginTransaction().
-                    add(R.id.score_frame, new ScoreListFragment()).
-                    commit();
-        }
-    }
+    public void setContentFragment(Fragment fragment){
+        getFragmentManager().
+                beginTransaction().
+                replace(R.id.fragment_frame, fragment).
+                commit();
+   }
 }

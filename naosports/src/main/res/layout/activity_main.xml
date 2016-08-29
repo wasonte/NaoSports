@@ -228,7 +228,7 @@
     </GridLayout>
 
     <FrameLayout
-        android:id="@+id/score_frame"
+        android:id="@+id/fragment_frame"
         android:layout_below="@id/my_toolbar"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

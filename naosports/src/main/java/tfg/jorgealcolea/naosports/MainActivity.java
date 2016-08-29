@@ -52,6 +52,7 @@ public class MainActivity extends AppCompatActivity implements
     private TextView timerTextView;
 
     private TextView textViewPlayerName;
+    private TextView textViewRivalname;
     private LinearLayout linearLayoutPlayer2Score;
     private ImageView imageViewVS;
 
@@ -102,10 +103,12 @@ public class MainActivity extends AppCompatActivity implements
 
         imageViewVS = (ImageView)findViewById(R.id.vs_image);
         linearLayoutPlayer2Score = (LinearLayout)findViewById(R.id.player2_score);
+        textViewRivalname = (TextView)findViewById(R.id.textview_rivalname);
 
         if (RobotSession.getInstance().getMode().equals("versus")){
             imageViewVS.setVisibility(View.VISIBLE);
             linearLayoutPlayer2Score.setVisibility(View.VISIBLE);
+            textViewRivalname.setText(RobotSession.getInstance().getRivalName());
         }
 
         // Robot controllers
@@ -158,12 +161,18 @@ public class MainActivity extends AppCompatActivity implements
             }
         }
         LocalBroadcastManager.getInstance(this).registerReceiver(mNotificationBroadcastReceiver,
-                new IntentFilter(MyGcmManager.GCM_NOTIFICATION));
+                new IntentFilter(MyGcmManager.GCM_UPDATE_SCORE));
+    }
+
+    @Override
+    protected void onStop(){
+        RobotSession.getInstance().unsuscribeToVideo();
+        timer.cancel();
+        super.onStop();
     }
 
     @Override
     protected void onDestroy() {
-        RobotSession.getInstance().unsuscribeToVideo();
         //application.stop();
         super.onDestroy();
     }
@@ -172,6 +181,7 @@ public class MainActivity extends AppCompatActivity implements
 
         if (scoreTable.getVisibility() == View.VISIBLE){
             scoreTable.setVisibility(View.GONE);
+
         } else {
             new AlertDialog.Builder(this)
                     .setTitle("Really Exit?")
@@ -265,9 +275,6 @@ public class MainActivity extends AppCompatActivity implements
                     scoreRivalTextView.setText(intent.getStringExtra("rivalScore"));
                     Toast.makeText(context, "GOOOOOOOOOOOOOOOOOOL", Toast.LENGTH_SHORT).show();
                 }
-
-
-
             }
         };
     }

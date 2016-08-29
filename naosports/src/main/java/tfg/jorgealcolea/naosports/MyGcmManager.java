@@ -15,7 +15,8 @@ import tfg.jorgealcolea.naosports.gcm.GcmRegistrationIntentService;
  */
 public class MyGcmManager {
 
-    public static final String GCM_NOTIFICATION = "GcmNotification";
+    public static final String GCM_UPDATE_SCORE = "GcmUpdateScore";
+    public static final String GCM_START = "GcmStart";
 
     // Singleton
     private static MyGcmManager gcmInstance = new MyGcmManager();

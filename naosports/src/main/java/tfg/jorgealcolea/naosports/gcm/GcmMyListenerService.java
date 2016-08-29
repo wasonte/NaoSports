@@ -30,14 +30,21 @@ public class GcmMyListenerService extends GcmListenerService {
         Log.d(TAG, "From: " + from);
         Log.d(TAG, "action: " + action);
 
-        Intent intent = new Intent(MyGcmManager.GCM_NOTIFICATION);
-        if (RobotSession.getInstance().getMode().equals("solo")){
-            intent.putExtra("playerScore", data.getString("playerScore"));
-        } else {
-            // Versus mode
-            intent.putExtra("playerScore", data.getString("playerScore"));
-            intent.putExtra("rivalScore", data.getString("rivalScore"));
+        if (action.equals("start")){
+            Intent intent = new Intent(MyGcmManager.GCM_START);
+            LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+        } else if (action.equals("score")){
+            Intent intent = new Intent(MyGcmManager.GCM_UPDATE_SCORE);
+            if (RobotSession.getInstance().getMode().equals("solo")){
+                intent.putExtra("playerScore", data.getString("playerScore"));
+            } else {
+                // Versus mode
+                intent.putExtra("playerScore", data.getString("playerScore"));
+                intent.putExtra("rivalScore", data.getString("rivalScore"));
+            }
+            LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
         }
-        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+
+
     }
 }

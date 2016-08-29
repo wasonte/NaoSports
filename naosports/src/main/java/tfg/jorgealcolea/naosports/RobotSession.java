@@ -76,9 +76,8 @@ public class RobotSession {
     //
     ////////////////////
 
-    public void startServiceRoutine(String ip, String playerName, boolean mode) throws Exception {
+    public void startServiceRoutine(String ip, boolean mode) throws Exception {
         this.ip = ip;
-        this.playerName = playerName;
         this.mode = (mode)?"versus":"solo";
         session = new Session();
 
@@ -327,9 +326,12 @@ public class RobotSession {
     //
     ////////////////////
 
-
     public String getPlayerName() {
         return playerName;
+    }
+
+    public void setPlayerName(String playerName) {
+        this.playerName = playerName;
     }
 
     public boolean isSubscribedToRedBall() {
@@ -348,7 +350,13 @@ public class RobotSession {
         return mode;
     }
 
+
     public String getRivalName() {
         return rivalName;
     }
+
+    public void setRivalName(String rivalName) {
+        this.rivalName = rivalName;
+    }
+
 }

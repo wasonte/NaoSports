@@ -44,10 +44,10 @@ public class GcmSender {
     public static void main(String[] args) {
 
         // TODO this fields should be setted by the clients
-        playerToken = "fv3H7A4KzkQ:APA91bHFs3H4ezmD9_yoMxZCGq-67RyEtplo5Ry95pJZ5DQ7l0MTin8Hp-ed7sAuZkVQ7A1-AMm9MiVRrinTc_DxicJcjoKTMdb4_jqLKdP8vDG8X31LnvJV0PRUu3vh2kegfWLl56R0";
+        playerToken = "eGpEPM60IMg:APA91bETV3gvqQriJCnccibfqv9JeNa-KCBauUB6kBezwRoX6cLRzGiziV-kP9wuO_tJhq9o3yLlDUW5mR15HRtoPdtegWd33X6MVRAotxC-kiFGLcs2XUeFgJIB7cB2TvhOrmfwmCx9";
         rivalToken  = "";
-        //mode = "solo";
-        mode = "versus";
+        mode = "solo";
+        //mode = "versus";
 
         if (args.length < 1) {
             System.exit(1);

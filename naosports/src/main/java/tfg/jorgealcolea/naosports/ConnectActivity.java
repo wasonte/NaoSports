@@ -46,6 +46,7 @@ public class ConnectActivity extends AppCompatActivity {
     private ToggleButton toggleMode;
     private Button buttonPlay;
     private Button buttonScore;
+    private Button buttonVsScore;
     private Spinner timeSpinner;
     private FrameLayout scoreTable;
 
@@ -61,6 +62,7 @@ public class ConnectActivity extends AppCompatActivity {
         layoutRivalName = (LinearLayout)findViewById(R.id.layout_rival_name);
         buttonPlay = (Button)findViewById(R.id.button_play);
         buttonScore = (Button)findViewById(R.id.button_score);
+        buttonVsScore  = (Button)findViewById(R.id.button_vs_score);
         editTextPlayerName = (EditText)findViewById(R.id.edittext_player_name);
         editTextIp = (EditText)findViewById(R.id.edittext_ip);
         // TODO de momento no hago nada con la ip del rival
@@ -106,6 +108,7 @@ public class ConnectActivity extends AppCompatActivity {
             public void onClick(View v) {
                 buttonPlay.setVisibility(View.GONE);
                 buttonScore.setVisibility(View.GONE);
+                buttonVsScore.setVisibility(View.GONE);
                 setContentFragment();
                 scoreTable.setVisibility(View.VISIBLE);
             }
@@ -121,6 +124,7 @@ public class ConnectActivity extends AppCompatActivity {
             scoreTable.setVisibility(View.GONE);
             buttonPlay.setVisibility(View.VISIBLE);
             buttonScore.setVisibility(View.VISIBLE);
+            buttonVsScore.setVisibility(View.VISIBLE);
         } else {
             super.onBackPressed();
         }
@@ -174,7 +178,7 @@ public class ConnectActivity extends AppCompatActivity {
     public void createIntent(){
         progress.dismiss();
         Intent intent = new Intent(context, MainActivity.class);
-        intent.putExtra("gameDuration", getGameDuration(timeSpinner.getSelectedItemPosition()));
+        //intent.putExtra("gameDuration", getGameDuration(timeSpinner.getSelectedItemPosition()));
         startActivity(intent);
     }
 
@@ -218,12 +222,10 @@ public class ConnectActivity extends AppCompatActivity {
     }
 
     public void setContentFragment(){
-        if (getFragmentManager().findFragmentById(R.id.score_table_connect) == null) {
             getFragmentManager().
                     beginTransaction().
-                    add(R.id.score_table_connect, new ScoreListFragment()).
+                    replace(R.id.score_table_connect, new ScoreListFragment()).
                     commit();
-        }
     }
 
     public void initializeReceiver(){

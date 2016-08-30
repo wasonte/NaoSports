@@ -1,5 +1,6 @@
 package tfg.jorgealcolea.naosports;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Fragment;
 import android.content.BroadcastReceiver;
@@ -167,13 +168,13 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     protected void onStop(){
-        RobotSession.getInstance().unsuscribeToVideo();
-        timer.cancel();
         super.onStop();
     }
 
     @Override
     protected void onDestroy() {
+        RobotSession.getInstance().unsuscribeToVideo();
+        RobotSession.getInstance().cloneConnection();
         //application.stop();
         super.onDestroy();
     }
@@ -192,12 +193,23 @@ public class MainActivity extends AppCompatActivity implements
                     .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
 
                         public void onClick(DialogInterface arg0, int arg1) {
-                            MainActivity.super.onBackPressed();
+                            leaveGame();
                         }
                     }).create().show();
 
             // TODO Desconectar sesion y guardar puntuacion si sale
         }
+    }
+
+    public void leaveGame(){
+        timer.cancel();
+        timerTextView.setText("00:00");
+        Bundle bundle = new Bundle();
+        bundle.putBoolean("leave", true);
+        Fragment fragment = new ResultFragment();
+        fragment.setArguments(bundle);
+        setContentFragment(fragment);
+        scoreTable.setVisibility(View.VISIBLE);
     }
 
 
@@ -257,8 +269,11 @@ public class MainActivity extends AppCompatActivity implements
             @Override
             public void onFinish() {
                 timerTextView.setText("00:00");
-                RobotSession.getInstance().setPlayerScore(Integer.parseInt(scorePlayerTextView.getText().toString()));
-                if (RobotSession.getInstance().getMode().equals("versus")){
+                if (RobotSession.getInstance().getMode().equals("solo")){
+                    RobotSession.getInstance().setPlayerScore(Integer.parseInt(scorePlayerTextView.getText().toString()));
+                    RobotSession.getInstance().insertSoloScore((Activity)context);
+                } else {
+                    RobotSession.getInstance().setPlayerScore(Integer.parseInt(scorePlayerTextView.getText().toString()));
                     RobotSession.getInstance().setRivalScore(Integer.parseInt(scoreRivalTextView.getText().toString()));
                 }
                 setContentFragment(new ResultFragment());
@@ -392,7 +407,8 @@ public class MainActivity extends AppCompatActivity implements
                 setContentFragment(new ScoreListFragment());
                 scoreTable.setVisibility(View.VISIBLE);
                 return true;
-            case R.id.action_settings:
+            case R.id.action_quit:
+                leaveGame();
                 return true;
             default:
                 // If we got here, the user's action was not recognized.

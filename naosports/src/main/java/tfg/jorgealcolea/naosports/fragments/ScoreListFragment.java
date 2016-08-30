@@ -6,7 +6,6 @@ import android.view.View;
 
 import tfg.jorgealcolea.naosports.R;
 import tfg.jorgealcolea.naosports.adapters.ScoreAdapter;
-import tfg.jorgealcolea.naosports.beans.Score;
 import tfg.jorgealcolea.naosports.sqlite.DatabaseAdapter;
 
 /**
@@ -22,15 +21,8 @@ public class ScoreListFragment extends ListFragment {
 
         DatabaseAdapter dbAdapter = new DatabaseAdapter(getActivity());
         adapter = new ScoreAdapter(getActivity(), R.layout.item_scorelist);
-
-        if (dbAdapter.getScores().size() == 0){
-            for (int i = 0; i < 50; i++){
-                Score score = new Score("Jorge" + i, 23);
-                dbAdapter.insertScore(score);
-            }
-        }
-
         adapter.setScores(dbAdapter.getScores());
+        adapter.notifyDataSetChanged();
         setListAdapter(adapter);
     }
 }

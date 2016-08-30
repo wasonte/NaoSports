@@ -1,5 +1,6 @@
 package tfg.jorgealcolea.naosports;
 
+import android.app.Activity;
 import android.graphics.Bitmap;
 import android.util.Log;
 
@@ -17,6 +18,9 @@ import java.net.InetAddress;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
+
+import tfg.jorgealcolea.naosports.beans.Score;
+import tfg.jorgealcolea.naosports.sqlite.DatabaseAdapter;
 
 /**
  * Created by george on 18/08/16.
@@ -81,7 +85,6 @@ public class RobotSession {
         this.mode = (mode)?"versus":"solo";
         session = new Session();
 
-
         String ipAddress = ip;
         if (!ipAddress.contains(".")) {
             InetAddress[] inets = InetAddress.getAllByName(ipAddress);
@@ -127,6 +130,22 @@ public class RobotSession {
 
         video = new ALVideoDevice(session);
         moduleName = video.subscribeCamera("demoAndroid", topCamera, resolution, colorspace, frameRate);
+    }
+
+    public void cloneConnection(){
+        session.close();
+    }
+
+
+    ////////////////////
+    //
+    // Database Methods
+    //
+    ////////////////////
+    public void insertSoloScore(Activity activity){
+        DatabaseAdapter dbAdapter = new DatabaseAdapter(activity);
+        Score score = new Score(playerName, playerScore);
+        dbAdapter.insertScore(score);
     }
 
 

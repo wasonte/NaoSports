@@ -12,6 +12,9 @@ run {
         if (project.hasProperty('rival')) {
             params.add(project.rival)
         }
+        if (project.hasProperty('message')) {
+            params.add(project.message)
+        }
     }
     args params
 }

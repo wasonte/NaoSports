@@ -70,7 +70,8 @@ public class MainActivity extends AppCompatActivity implements
 
     private CountDownTimer timer;
 
-    private BroadcastReceiver mNotificationBroadcastReceiver;
+    private BroadcastReceiver mScoreBroadcastReceiver;
+    private BroadcastReceiver mChallengeBroadcastReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -148,7 +149,7 @@ public class MainActivity extends AppCompatActivity implements
     protected void onPause(){
         unRegisterHeadMovementManager();
         RobotSession.getInstance().unRegisterBallTracker();
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(mNotificationBroadcastReceiver);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mScoreBroadcastReceiver);
         super.onPause();
     }
 
@@ -162,8 +163,10 @@ public class MainActivity extends AppCompatActivity implements
                 RobotSession.getInstance().registerBallTracker();
             }
         }
-        LocalBroadcastManager.getInstance(this).registerReceiver(mNotificationBroadcastReceiver,
+        LocalBroadcastManager.getInstance(this).registerReceiver(mScoreBroadcastReceiver,
                 new IntentFilter(MyGcmManager.GCM_UPDATE_SCORE));
+        LocalBroadcastManager.getInstance(this).registerReceiver(mChallengeBroadcastReceiver,
+                new IntentFilter(MyGcmManager.GCM_CHALLENGE));
     }
 
     @Override
@@ -283,7 +286,7 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     public void initializeReceiver(){
-        mNotificationBroadcastReceiver = new BroadcastReceiver() {
+        mScoreBroadcastReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
 
@@ -297,6 +300,13 @@ public class MainActivity extends AppCompatActivity implements
                     scoreRivalTextView.setText(intent.getStringExtra("rivalScore"));
                     Toast.makeText(context, "GOOOOOOOOOOOOOOOOOOL", Toast.LENGTH_SHORT).show();
                 }
+            }
+        };
+
+        mChallengeBroadcastReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                Toast.makeText(context, intent.getStringExtra("message"), Toast.LENGTH_LONG).show();
             }
         };
     }

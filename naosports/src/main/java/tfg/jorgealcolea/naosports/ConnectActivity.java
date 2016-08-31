@@ -178,7 +178,7 @@ public class ConnectActivity extends AppCompatActivity {
     public void createIntent(){
         progress.dismiss();
         Intent intent = new Intent(context, MainActivity.class);
-        //intent.putExtra("gameDuration", getGameDuration(timeSpinner.getSelectedItemPosition()));
+        intent.putExtra("gameDuration", getGameDuration(timeSpinner.getSelectedItemPosition()));
         startActivity(intent);
     }
 

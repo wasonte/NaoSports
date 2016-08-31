@@ -43,6 +43,10 @@ public class GcmMyListenerService extends GcmListenerService {
                 intent.putExtra("rivalScore", data.getString("rivalScore"));
             }
             LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+        } else if (action.equals("challenge")){
+            Intent intent = new Intent(MyGcmManager.GCM_CHALLENGE);
+            intent.putExtra("message", data.getString("message"));
+            LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
         }
 
 

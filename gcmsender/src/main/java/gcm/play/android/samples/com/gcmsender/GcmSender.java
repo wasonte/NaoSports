@@ -61,6 +61,8 @@ public class GcmSender {
             System.exit(1);
         } else if (mode.equals("versus") && args[0].trim().equals("score") && args.length != 3){
             System.exit(1);
+        } else if (mode.equals("versus") && args[0].trim().equals("challenge") && args.length != 2){
+            System.exit(1);
         }
 
 
@@ -78,6 +80,7 @@ public class GcmSender {
         ./gradlew run -Paction="start"
         ./gradlew run -Paction="score" -Pplayer="3"
         ./gradlew run -Paction="score" -Pplayer="3" -Prival="1"
+        ./gradlew run -Paction="challenge" -Pmessage="Tiene que comerme el rabo ahora mismo!"
 
          */
 
@@ -90,12 +93,18 @@ public class GcmSender {
         List<String> idList = new ArrayList<>();
 
         if (mode.equals("solo")){
-            jData.put("playerScore", args[1].trim());
+            if (args[0].trim().equals("score")){
+                jData.put("playerScore", args[1].trim());
+            } else if (args[0].trim().equals("challenge")){
+                jData.put("message", args[1].trim());
+            }
             idList.add(playerToken);
         } else {
             if(args[0].equals("score")){
                 jData.put("playerScore", args[1].trim());
                 jData.put("rivalScore", args[2].trim());
+            } else if (args[0].trim().equals("challenge")){
+                jData.put("message", args[1].trim());
             }
             idList.add(playerToken);
             idList.add(rivalToken);

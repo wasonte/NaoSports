@@ -17,6 +17,7 @@ public class MyGcmManager {
 
     public static final String GCM_UPDATE_SCORE = "GcmUpdateScore";
     public static final String GCM_START = "GcmStart";
+    public static final String GCM_CHALLENGE = "GcmChallenge";
 
     // Singleton
     private static MyGcmManager gcmInstance = new MyGcmManager();

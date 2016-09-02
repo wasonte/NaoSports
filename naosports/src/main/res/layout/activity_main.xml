@@ -147,85 +147,116 @@
         android:layout_marginTop="-16dp" />
     
     <View
+        android:id="@+id/image_separator"
         android:layout_below="@id/image_view"
         android:layout_width="match_parent"
         android:layout_height="6dp"
         android:background="@color/colorAccent"
         android:layout_marginTop="-16dp"></View>
 
-    <Switch
-        android:layout_width="wrap_content"
+    <RelativeLayout
+        android:id="@+id/buttonsLayout"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Track ball"
-        android:id="@+id/trackBallSwitch"
-        android:checked="false"
-        android:layout_marginTop="10dp"
-        android:enabled="false"
-        android:layout_above="@+id/headMovementSwitch"
-        android:layout_alignParentRight="true"
-        android:layout_marginRight="5dp"/>
+        android:layout_below="@id/image_separator"
+        android:layout_margin="5dp">
 
-    <Switch
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Mover cabeza"
-        android:id="@+id/headMovementSwitch"
-        android:checked="false"
-        android:layout_marginTop="10dp"
-        android:enabled="false"
-        android:layout_above="@+id/move_controls"
-        android:layout_alignParentRight="true"
-        android:layout_marginRight="5dp"/>
+        <GridLayout
+            android:layout_width="wrap_content"
+            android:columnCount="3"
+            android:rowCount="3"
+            android:id="@+id/move_controls"
+            android:layout_alignParentLeft="true"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="5dp"
+            android:layout_marginBottom="5dp">
+            <ImageView
+                android:layout_width="50dp"
+                android:layout_height="50dp"/>
+            <ImageButton
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:scaleType="fitXY"
+                android:onClick="onGoToFront"/>
+            <ImageView
+                android:layout_width="50dp"
+                android:layout_height="50dp"/>
+            <ImageButton
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:scaleType="fitXY"
+                android:onClick="onGoToLeft"/>
+            <ImageButton
+                android:layout_width="50dp"
+                android:scaleType="fitXY"
+                android:onClick="onStop"
+                android:layout_height="50dp"/>
+            <ImageButton
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:scaleType="fitXY"
+                android:onClick="onGoToRight"/>
+            <ImageView
+                android:layout_width="50dp"
+                android:layout_height="50dp"/>
+            <ImageButton
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:scaleType="fitXY"
+                android:onClick="onGoToBack"/>
+            <ImageView
+                android:layout_width="50dp"
+                android:layout_height="50dp"/>
+        </GridLayout>
 
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@id/move_controls"
+            >
+            <ToggleButton
+                android:id="@+id/headToggle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="false"
+                android:textOff="Head"
+                android:textOn="Head"/>
 
-    <GridLayout
-        android:layout_width="wrap_content"
-        android:columnCount="3"
-        android:rowCount="3"
-        android:id="@+id/move_controls"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="5dp"
-        android:layout_marginRight="5dp">
-        <ImageView
-            android:layout_width="50dp"
-            android:layout_height="50dp"/>
-        <ImageButton
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:scaleType="fitXY"
-            android:onClick="onGoToFront"/>
-        <ImageView
-            android:layout_width="50dp"
-            android:layout_height="50dp"/>
-        <ImageButton
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:scaleType="fitXY"
-            android:onClick="onGoToLeft"/>
-        <ImageButton
-            android:layout_width="50dp"
-            android:scaleType="fitXY"
-            android:onClick="onStop"
-            android:layout_height="50dp"/>
-        <ImageButton
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:scaleType="fitXY"
-            android:onClick="onGoToRight"/>
-        <ImageView
-            android:layout_width="50dp"
-            android:layout_height="50dp"/>
-        <ImageButton
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:scaleType="fitXY"
-            android:onClick="onGoToBack"/>
-        <ImageView
-            android:layout_width="50dp"
-            android:layout_height="50dp"/>
-    </GridLayout>
+            <ToggleButton
+                android:id="@+id/armToggle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:checked="false"
+                android:textOff="Arm"
+                android:textOn="Arm"/>
+
+            <ToggleButton
+                android:id="@+id/handToggle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="false"
+                android:textOff="Open Hand"
+                android:textOn="Close Hand"
+                android:layout_below="@id/headToggle"/>
+
+            <Button
+                android:id="@+id/talkButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/headToggle"
+                android:layout_alignParentRight="true"
+                android:text="Talk"/>
+        </RelativeLayout>
+
+        <ToggleButton
+            android:id="@+id/ballTrackToggle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textOff="Ball Tracker"
+            android:textOn="Ball Tracker"
+            android:layout_below="@id/move_controls"/>
+    </RelativeLayout>
 
     <FrameLayout
         android:id="@+id/fragment_frame"

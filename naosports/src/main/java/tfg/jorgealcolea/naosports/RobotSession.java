@@ -51,6 +51,10 @@ public class RobotSession {
     // Nao elements
     public static final String HeadYaw = "HeadYaw";
     public static final String HeadPitch = "HeadPitch";
+    public static final String RightHand = "RHand";
+    public static final String LeftHand = "LHand";
+    public static final String ShoulderPitch = "RShoulderPitch";
+    public static final String ShoulderRoll = "RShoulderRoll ";
 
     private static final int WIDTH = 160;
     private static final int HEIGHT = 120;
@@ -97,6 +101,8 @@ public class RobotSession {
         // Modules
         alMotion = new ALMotion(session);
         alMotion.wakeUp();
+        alMotion.closeHand(RightHand);
+        alMotion.closeHand(LeftHand);
 
         alSpeech = new ALTextToSpeech(session);
 
@@ -213,6 +219,20 @@ public class RobotSession {
 
     ////////////////////
     //
+    // Voice Methods
+    //
+    ////////////////////
+
+    public void say(String text){
+        try {
+            alSpeech.say(text);
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    ////////////////////
+    //
     // Movement methods
     //
     ////////////////////
@@ -303,6 +323,23 @@ public class RobotSession {
             return maxRadians*movement/maxMovement;
         }
     }
+
+    public void openHand(){
+        try {
+            alMotion.openHand(RightHand);
+        } catch(Exception except) {
+            except.printStackTrace();
+        }
+    }
+
+    public void closeHand(){
+        try {
+            alMotion.closeHand(RightHand);
+        } catch(Exception except) {
+            except.printStackTrace();
+        }
+    }
+
 
     private float velocityX = 0f;
     private float velocityY = 0f;

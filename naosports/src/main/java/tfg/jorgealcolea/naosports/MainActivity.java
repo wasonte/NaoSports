@@ -19,16 +19,21 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.text.InputType;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.CompoundButton;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import tfg.jorgealcolea.naosports.fragments.ResultFragment;
 import tfg.jorgealcolea.naosports.fragments.ScoreListFragment;
@@ -46,8 +51,6 @@ public class MainActivity extends AppCompatActivity implements
 
     private Context context;
 
-    private Switch headMovement;
-    private Switch trackBallSwitch;
     private FrameLayout scoreTable;
 
     private LinearLayout timerLayout;
@@ -60,6 +63,16 @@ public class MainActivity extends AppCompatActivity implements
 
     private TextView scorePlayerTextView;
     private TextView scoreRivalTextView;
+    // TODO arm movement
+
+    private RelativeLayout buttonsLayout;
+    private ToggleButton armToggle;
+    private ToggleButton headToggle;
+    private ToggleButton handToggle;
+    private ToggleButton ballTrackerToggle;
+
+    private Button talkButton;
+    private EditText talkEditText;
 
     private SensorManager mgr=null;
     private float movementX;
@@ -92,8 +105,6 @@ public class MainActivity extends AppCompatActivity implements
 
         timerLayout = (LinearLayout)findViewById(R.id.timerLayout);
         timerTextView = (TextView) findViewById(R.id.timer_text_view);
-        headMovement = (Switch) findViewById(R.id.headMovementSwitch);
-        trackBallSwitch = (Switch) findViewById(R.id.trackBallSwitch);
         image = (ImageView) findViewById(R.id.image_view);
 
         scoreTable = (FrameLayout)findViewById(R.id.fragment_frame);
@@ -108,6 +119,14 @@ public class MainActivity extends AppCompatActivity implements
         linearLayoutPlayer2Score = (LinearLayout)findViewById(R.id.player2_score);
         textViewRivalname = (TextView)findViewById(R.id.textview_rivalname);
 
+        buttonsLayout = (RelativeLayout)findViewById(R.id.buttonsLayout);
+        armToggle = (ToggleButton)findViewById(R.id.armToggle);
+        headToggle = (ToggleButton)findViewById(R.id.headToggle);
+        handToggle = (ToggleButton)findViewById(R.id.handToggle);
+        ballTrackerToggle = (ToggleButton)findViewById(R.id.ballTrackToggle);
+
+        talkButton = (Button)findViewById(R.id.talkButton);
+
         if (RobotSession.getInstance().getMode().equals("versus")){
             imageViewVS.setVisibility(View.VISIBLE);
             linearLayoutPlayer2Score.setVisibility(View.VISIBLE);
@@ -118,31 +137,11 @@ public class MainActivity extends AppCompatActivity implements
         handler = new Handler();
         mgr=(SensorManager)getSystemService(Context.SENSOR_SERVICE);
 
-        headMovement.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
-                    registerHeadMovementManager();
-                } else {
-                    unRegisterHeadMovementManager();
-                }
-            }
-        });
-
-        trackBallSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
-                    RobotSession.getInstance().setSubscribedToRedBall(true);
-                    RobotSession.getInstance().registerBallTracker();
-                } else {
-                    RobotSession.getInstance().setSubscribedToRedBall(false);
-                    RobotSession.getInstance().unRegisterBallTracker();
-                }
-            }
-        });
-
         initializeReceiver();
         initiazeVideo();
         initiazeTimer();
+        initializeButtons();
+        unRegisterHeadMovementManager();
     }
 
     @Override
@@ -157,9 +156,9 @@ public class MainActivity extends AppCompatActivity implements
     protected void onResume(){
         super.onResume();
         if (RobotSession.getInstance().isAlMotion()){
-            if (headMovement.isChecked())
+            if (headToggle.isChecked())
                 registerHeadMovementManager();
-            if(trackBallSwitch.isChecked()){
+            if(ballTrackerToggle.isChecked()){
                 RobotSession.getInstance().registerBallTracker();
             }
         }
@@ -178,7 +177,6 @@ public class MainActivity extends AppCompatActivity implements
     protected void onDestroy() {
         RobotSession.getInstance().unsuscribeToVideo();
         RobotSession.getInstance().cloneConnection();
-        //application.stop();
         super.onDestroy();
     }
 
@@ -188,6 +186,7 @@ public class MainActivity extends AppCompatActivity implements
             finish();
         } else if (scoreTable.getVisibility() == View.VISIBLE){
             scoreTable.setVisibility(View.GONE);
+            showButtons(View.VISIBLE);
         } else {
             new AlertDialog.Builder(this)
                     .setTitle("Really Exit?")
@@ -204,7 +203,12 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
+    public void showButtons(int visibility){
+        buttonsLayout.setVisibility(visibility);
+    }
+
     public void leaveGame(){
+        showButtons(View.GONE);
         timer.cancel();
         timerTextView.setText("00:00");
         Bundle bundle = new Bundle();
@@ -239,14 +243,6 @@ public class MainActivity extends AppCompatActivity implements
 
                     }
                 });
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        headMovement.setEnabled(true);
-                        trackBallSwitch.setEnabled(true);
-                        unRegisterHeadMovementManager();
-                    }
-                });
             }
         });
         routine.start();
@@ -279,6 +275,7 @@ public class MainActivity extends AppCompatActivity implements
                     RobotSession.getInstance().setPlayerScore(Integer.parseInt(scorePlayerTextView.getText().toString()));
                     RobotSession.getInstance().setRivalScore(Integer.parseInt(scoreRivalTextView.getText().toString()));
                 }
+                showButtons(View.GONE);
                 setContentFragment(new ResultFragment());
                 scoreTable.setVisibility(View.VISIBLE);
             }
@@ -293,13 +290,12 @@ public class MainActivity extends AppCompatActivity implements
                 // TODO controlar el modo versus
                 if (RobotSession.getInstance().getMode().equals("solo")){
                     scorePlayerTextView.setText(intent.getStringExtra("playerScore"));
-                    Toast.makeText(context, "GOOOOOOOOOOOOOOOOOOL", Toast.LENGTH_SHORT).show();
                 } else {
                     // Versus mode
                     scorePlayerTextView.setText(intent.getStringExtra("playerScore"));
                     scoreRivalTextView.setText(intent.getStringExtra("rivalScore"));
-                    Toast.makeText(context, "GOOOOOOOOOOOOOOOOOOL", Toast.LENGTH_SHORT).show();
                 }
+                Toast.makeText(context, "Score updated", Toast.LENGTH_SHORT).show();
             }
         };
 
@@ -309,6 +305,84 @@ public class MainActivity extends AppCompatActivity implements
                 Toast.makeText(context, intent.getStringExtra("message"), Toast.LENGTH_LONG).show();
             }
         };
+    }
+
+    public void initializeButtons(){
+        armToggle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    headToggle.setChecked(false);
+                } else {
+
+                }
+            }
+        });
+
+        headToggle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    armToggle.setChecked(false);
+                    registerHeadMovementManager();
+                } else {
+                    unRegisterHeadMovementManager();
+                }
+            }
+        });
+
+        handToggle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    RobotSession.getInstance().openHand();
+                } else {
+                    RobotSession.getInstance().closeHand();
+                }
+            }
+        });
+
+
+
+        ballTrackerToggle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    RobotSession.getInstance().setSubscribedToRedBall(true);
+                    RobotSession.getInstance().registerBallTracker();
+                } else {
+                    RobotSession.getInstance().setSubscribedToRedBall(false);
+                    RobotSession.getInstance().unRegisterBallTracker();
+                }
+            }
+        });
+
+        talkButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new AlertDialog.Builder(context)
+                    .setTitle("What you wanna say?")
+                    .setView(resetTalkEditText())
+                    .setNegativeButton("Nothing", null)
+                    .setPositiveButton("Say it!", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface arg0, int arg1) {
+                            if (talkEditText.getText().toString() != "") {
+                                RobotSession.getInstance().say(talkEditText.getText().toString());
+                                Toast.makeText(context, talkEditText.getText().toString(), Toast.LENGTH_SHORT).show();
+                            } else {
+                                RobotSession.getInstance().say("What?");
+                            }
+                        }
+                    }).create().show();
+            }
+        });
+
+    }
+
+    public EditText resetTalkEditText(){
+        talkEditText= new EditText(this);
+        talkEditText.setInputType(InputType.TYPE_CLASS_TEXT);
+        return talkEditText;
     }
 
 
@@ -415,6 +489,7 @@ public class MainActivity extends AppCompatActivity implements
         switch (item.getItemId()) {
             case R.id.action_score:
                 setContentFragment(new ScoreListFragment());
+                showButtons(View.GONE);
                 scoreTable.setVisibility(View.VISIBLE);
                 return true;
             case R.id.action_quit:
@@ -434,4 +509,6 @@ public class MainActivity extends AppCompatActivity implements
                 replace(R.id.fragment_frame, fragment).
                 commit();
    }
+
+
 }

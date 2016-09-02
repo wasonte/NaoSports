@@ -44,7 +44,7 @@ public class GcmSender {
     public static void main(String[] args) {
 
         // TODO this fields should be setted by the clients
-        playerToken = "eGpEPM60IMg:APA91bETV3gvqQriJCnccibfqv9JeNa-KCBauUB6kBezwRoX6cLRzGiziV-kP9wuO_tJhq9o3yLlDUW5mR15HRtoPdtegWd33X6MVRAotxC-kiFGLcs2XUeFgJIB7cB2TvhOrmfwmCx9";
+        playerToken = "erncXa-k0_0:APA91bH882nZ_YrV8Ms5y7ohuRSqbSOfqOoWzm-6OCmkN8hHj88YcXHyclCo_x1W0uigwDpWMqTw1qV0_NrR4RBDebE8IMp7TmXb41uGH79agQmvtSpfy4fuFBBe4CE4cJyMvT0CE1uo";
         rivalToken  = "";
         mode = "solo";
         //mode = "versus";
@@ -80,7 +80,7 @@ public class GcmSender {
         ./gradlew run -Paction="start"
         ./gradlew run -Paction="score" -Pplayer="3"
         ./gradlew run -Paction="score" -Pplayer="3" -Prival="1"
-        ./gradlew run -Paction="challenge" -Pmessage="Tiene que comerme el rabo ahora mismo!"
+        ./gradlew run -Paction="challenge" -Pmessage="Tienes que dar una vuelta sobre ti mismo!"
 
          */
 

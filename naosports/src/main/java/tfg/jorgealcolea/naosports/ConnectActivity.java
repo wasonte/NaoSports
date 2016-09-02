@@ -65,7 +65,6 @@ public class ConnectActivity extends AppCompatActivity {
         buttonVsScore  = (Button)findViewById(R.id.button_vs_score);
         editTextPlayerName = (EditText)findViewById(R.id.edittext_player_name);
         editTextIp = (EditText)findViewById(R.id.edittext_ip);
-        // TODO de momento no hago nada con la ip del rival
         editTextRivalName = (EditText)findViewById(R.id.edittext_rival_name);
         timeSpinner = (Spinner)findViewById(R.id.time_spinner);
         scoreTable = (FrameLayout)findViewById(R.id.score_table_connect);

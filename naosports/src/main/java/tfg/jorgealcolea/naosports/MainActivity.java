@@ -3,6 +3,7 @@ package tfg.jorgealcolea.naosports;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Fragment;
+import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -38,6 +39,7 @@ import android.widget.ToggleButton;
 import tfg.jorgealcolea.naosports.fragments.ResultFragment;
 import tfg.jorgealcolea.naosports.fragments.ScoreListFragment;
 
+import com.aldebaran.qi.CallError;
 import com.aldebaran.qi.EmbeddedTools;
 
 import java.io.File;
@@ -82,6 +84,8 @@ public class MainActivity extends AppCompatActivity implements
     private ImageView image;
 
     private CountDownTimer timer;
+
+    private ProgressDialog progress;
 
     private BroadcastReceiver mScoreBroadcastReceiver;
     private BroadcastReceiver mChallengeBroadcastReceiver;
@@ -207,7 +211,17 @@ public class MainActivity extends AppCompatActivity implements
         buttonsLayout.setVisibility(visibility);
     }
 
+    public void stopRobotActions(){
+        onStop(null);
+        headToggle.setChecked(false);
+        armToggle.setChecked(false);
+        ballTrackerToggle.setChecked(false);
+    }
+
+
+
     public void leaveGame(){
+        stopRobotActions();
         showButtons(View.GONE);
         timer.cancel();
         timerTextView.setText("00:00");
@@ -275,6 +289,7 @@ public class MainActivity extends AppCompatActivity implements
                     RobotSession.getInstance().setPlayerScore(Integer.parseInt(scorePlayerTextView.getText().toString()));
                     RobotSession.getInstance().setRivalScore(Integer.parseInt(scoreRivalTextView.getText().toString()));
                 }
+                stopRobotActions();
                 showButtons(View.GONE);
                 setContentFragment(new ResultFragment());
                 scoreTable.setVisibility(View.VISIBLE);
@@ -361,19 +376,19 @@ public class MainActivity extends AppCompatActivity implements
             @Override
             public void onClick(View v) {
                 new AlertDialog.Builder(context)
-                    .setTitle("What you wanna say?")
-                    .setView(resetTalkEditText())
-                    .setNegativeButton("Nothing", null)
-                    .setPositiveButton("Say it!", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface arg0, int arg1) {
-                            if (talkEditText.getText().toString() != "") {
-                                RobotSession.getInstance().say(talkEditText.getText().toString());
-                                Toast.makeText(context, talkEditText.getText().toString(), Toast.LENGTH_SHORT).show();
-                            } else {
-                                RobotSession.getInstance().say("What?");
+                        .setTitle("What you wanna say?")
+                        .setView(resetTalkEditText())
+                        .setNegativeButton("Nothing", null)
+                        .setPositiveButton("Say it!", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface arg0, int arg1) {
+                                if (talkEditText.getText().toString() != "") {
+                                    RobotSession.getInstance().say(talkEditText.getText().toString());
+                                    Toast.makeText(context, talkEditText.getText().toString(), Toast.LENGTH_SHORT).show();
+                                } else {
+                                    RobotSession.getInstance().say("What?");
+                                }
                             }
-                        }
-                    }).create().show();
+                        }).create().show();
             }
         });
 
@@ -433,6 +448,8 @@ public class MainActivity extends AppCompatActivity implements
     public void onGoToFront(View view) {
         try {
             RobotSession.getInstance().onGoToFront();
+        } catch(CallError c){
+            Toast.makeText(context, "Connection lost, check your robot and try to reconnect", Toast.LENGTH_SHORT).show();
         } catch (Exception e){
             e.printStackTrace();
         }
@@ -441,7 +458,9 @@ public class MainActivity extends AppCompatActivity implements
     public void onStop(View view) {
         try {
             RobotSession.getInstance().onStop();
-        } catch (Exception e){
+        } catch(CallError c){
+            Toast.makeText(context, "Connection lost, check your robot and try to reconnect", Toast.LENGTH_SHORT).show();
+        }catch (Exception e){
             e.printStackTrace();
         }
     }
@@ -450,7 +469,9 @@ public class MainActivity extends AppCompatActivity implements
     public void onGoToLeft(View view) {
         try {
             RobotSession.getInstance().onGoToLeft();
-        } catch (Exception e){
+        } catch(CallError c){
+            Toast.makeText(context, "Connection lost, check your robot and try to reconnect", Toast.LENGTH_SHORT).show();
+        }catch (Exception e){
             e.printStackTrace();
         }
     }
@@ -458,7 +479,9 @@ public class MainActivity extends AppCompatActivity implements
     public void onGoToRight(View view) {
         try {
             RobotSession.getInstance().onGoToRight();
-        } catch (Exception e){
+        } catch(CallError c){
+            Toast.makeText(context, "Connection lost, check your robot and try to reconnect", Toast.LENGTH_SHORT).show();
+        }catch (Exception e){
             e.printStackTrace();
         }
     }
@@ -466,7 +489,9 @@ public class MainActivity extends AppCompatActivity implements
     public void onGoToBack(View view) {
         try {
             RobotSession.getInstance().onGoToBack();
-        } catch (Exception e){
+        } catch(CallError c){
+            Toast.makeText(context, "Connection lost, check your robot and try to reconnect", Toast.LENGTH_SHORT).show();
+        }catch (Exception e){
             e.printStackTrace();
         }
     }
@@ -491,6 +516,38 @@ public class MainActivity extends AppCompatActivity implements
                 setContentFragment(new ScoreListFragment());
                 showButtons(View.GONE);
                 scoreTable.setVisibility(View.VISIBLE);
+                return true;
+            case R.id.action_reconnect:
+                progress = ProgressDialog.show(context, null, "Reconnecting to robot", true);
+                Thread routine = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Looper.prepare();
+                        try {
+                            RobotSession.getInstance().startServiceRoutine(null, false);
+                            progress.dismiss();
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Toast.makeText(context, "Reconnected to robot", Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                        } catch (Exception e){
+                            e.printStackTrace();
+                            progress.dismiss();
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Toast.makeText(context, "Connection error, please try again", Toast.LENGTH_SHORT).show();
+                                }
+                            });
+
+                        }
+
+
+                    }
+                });
+                routine.start();
                 return true;
             case R.id.action_quit:
                 leaveGame();

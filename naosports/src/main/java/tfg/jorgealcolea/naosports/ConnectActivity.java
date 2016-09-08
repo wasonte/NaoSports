@@ -46,7 +46,6 @@ public class ConnectActivity extends AppCompatActivity {
     private ToggleButton toggleMode;
     private Button buttonPlay;
     private Button buttonScore;
-    private Button buttonVsScore;
     private Spinner timeSpinner;
     private FrameLayout scoreTable;
 
@@ -62,7 +61,6 @@ public class ConnectActivity extends AppCompatActivity {
         layoutRivalName = (LinearLayout)findViewById(R.id.layout_rival_name);
         buttonPlay = (Button)findViewById(R.id.button_play);
         buttonScore = (Button)findViewById(R.id.button_score);
-        buttonVsScore  = (Button)findViewById(R.id.button_vs_score);
         editTextPlayerName = (EditText)findViewById(R.id.edittext_player_name);
         editTextIp = (EditText)findViewById(R.id.edittext_ip);
         editTextRivalName = (EditText)findViewById(R.id.edittext_rival_name);
@@ -107,7 +105,6 @@ public class ConnectActivity extends AppCompatActivity {
             public void onClick(View v) {
                 buttonPlay.setVisibility(View.GONE);
                 buttonScore.setVisibility(View.GONE);
-                buttonVsScore.setVisibility(View.GONE);
                 setContentFragment();
                 scoreTable.setVisibility(View.VISIBLE);
             }
@@ -123,7 +120,6 @@ public class ConnectActivity extends AppCompatActivity {
             scoreTable.setVisibility(View.GONE);
             buttonPlay.setVisibility(View.VISIBLE);
             buttonScore.setVisibility(View.VISIBLE);
-            buttonVsScore.setVisibility(View.VISIBLE);
         } else {
             super.onBackPressed();
         }

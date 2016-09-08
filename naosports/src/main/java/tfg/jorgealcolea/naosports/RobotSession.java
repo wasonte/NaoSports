@@ -85,11 +85,13 @@ public class RobotSession {
     ////////////////////
 
     public void startServiceRoutine(String ip, boolean mode) throws Exception {
-        this.ip = ip;
-        this.mode = (mode)?"versus":"solo";
+        if (ip != null){
+            this.ip = ip;
+            this.mode = (mode)?"versus":"solo";
+        }
         session = new Session();
 
-        String ipAddress = ip;
+        String ipAddress = this.ip;
         if (!ipAddress.contains(".")) {
             InetAddress[] inets = InetAddress.getAllByName(ipAddress);
             if (inets != null && inets.length > 0)

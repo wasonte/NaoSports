@@ -2,6 +2,7 @@
     <string name="app_name">naosports</string>
     <string name="action_settings">Settings</string>
     <string name="action_score">Score</string>
+    <string name="action_reconnect">Reconnect</string>
     <string name="action_quit">Leave game</string>
 
     <string-array name="time_arrays">

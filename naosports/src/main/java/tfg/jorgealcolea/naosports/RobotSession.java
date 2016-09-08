@@ -54,7 +54,7 @@ public class RobotSession {
     public static final String RightHand = "RHand";
     public static final String LeftHand = "LHand";
     public static final String ShoulderPitch = "RShoulderPitch";
-    public static final String ShoulderRoll = "RShoulderRoll ";
+    public static final String ShoulderRoll = "RShoulderRoll";
 
     private static final int WIDTH = 160;
     private static final int HEIGHT = 120;
@@ -238,19 +238,21 @@ public class RobotSession {
     // Movement methods
     //
     ////////////////////
-    public void moveHead(String joint, float newMovement){
-        if (getHeadMovementList(joint) == null){
+    public static final double MOVEMENT_THRESHOLD = 0.3;
+
+    public void moveWithAccelerometer(String joint, float newMovement){
+        if (getMovementList(joint) == null){
             initHeadMovementList(joint, true);
         }
-        if (Math.abs(newMovement) > 0.3){
-            getHeadMovementList(joint).add(newMovement);
+        if (Math.abs(newMovement) > MOVEMENT_THRESHOLD){
+            getMovementList(joint).add(newMovement);
         }
-        if (Math.abs(newMovement) < 0.3 && getHeadMovementList(joint).size() > 0){
+        if (Math.abs(newMovement) < MOVEMENT_THRESHOLD && getMovementList(joint).size() > 0){
             float positive = 0;
             float negative = 0;
-            boolean sign = (getHeadMovementList(joint).get(0) > 0)?true:false;
+            boolean sign = (getMovementList(joint).get(0) > 0)?true:false;
 
-            for (Float move : getHeadMovementList(joint)){
+            for (Float move : getMovementList(joint)){
                 if (move > 0){
                     positive += move;
                 } else {
@@ -260,9 +262,9 @@ public class RobotSession {
             if (positive > 0 && negative > 0){
                 try {
                     if (sign){
-                        lookTo(joint, -headMovementToRadians(joint, positive));
+                        moveJoint(joint, -movementToRadians(joint, positive));
                     } else {
-                        lookTo(joint, headMovementToRadians(joint, negative));
+                        moveJoint(joint, movementToRadians(joint, negative));
                     }
                 } catch(Exception except) {
                     except.printStackTrace();
@@ -273,10 +275,10 @@ public class RobotSession {
     }
 
 
-    public List<Float> getHeadMovementList(String joint){
-        if (joint.equals(HeadYaw)){
+    public List<Float> getMovementList(String joint){
+        if (joint.equals(HeadYaw) || joint.equals(ShoulderRoll)){
             return movementListX;
-        } else if (joint.equals(HeadPitch)){
+        } else if (joint.equals(HeadPitch) || joint.equals(ShoulderPitch)){
             return movementListY;
         }
         return null;
@@ -284,30 +286,30 @@ public class RobotSession {
 
     public void initHeadMovementList(String joint, boolean init){
         List<Float> empty = new ArrayList<>();
-        if (joint.equals(HeadYaw)){
+        if (joint.equals(HeadYaw) || joint.equals(ShoulderRoll)){
             movementListX = (init)?empty:null;
-        } else if (joint.equals(HeadPitch)){
+        } else if (joint.equals(HeadPitch) || joint.equals(ShoulderPitch)){
             movementListY = (init)?empty:null;
         }
     }
 
-    public void lookTo(String joint,float delta) throws InterruptedException, CallError{
-        if (joint.equals(HeadYaw)){
-            lookRightOrLeft(delta);
-        } else if (joint.equals(HeadPitch)){
-            lookUpAndDown(delta);
+    public void moveJoint(String joint, float delta) throws InterruptedException, CallError{
+        if (joint.equals(HeadYaw) || joint.equals(ShoulderPitch)){
+            moveAxisX(joint, delta);
+        } else if (joint.equals(HeadPitch)|| joint.equals(ShoulderRoll)){
+            moveAxisY(joint, delta);
         }
     }
 
-    public void lookUpAndDown(Float delta) throws InterruptedException, CallError {
-        alMotion.changeAngles(HeadPitch, delta, 0.5F);
+    public void moveAxisY(String joint, Float delta) throws InterruptedException, CallError {
+        alMotion.changeAngles(joint, delta, 0.5F);
     }
 
-    public void lookRightOrLeft(Float delta) throws InterruptedException, CallError {
-        alMotion.changeAngles(HeadYaw, delta, 0.5F);
+    public void moveAxisX(String joint, Float delta) throws InterruptedException, CallError {
+        alMotion.changeAngles(joint, delta, 0.5F);
     }
 
-    public float headMovementToRadians(String joint,float movement){
+    public float movementToRadians(String joint, float movement){
         float maxRadians = 0F;
         float maxMovement = 0F;
 
@@ -317,6 +319,12 @@ public class RobotSession {
         } else if (joint.equals(HeadPitch)){
             maxRadians = 1.1869F;
             maxMovement = 4F;
+        } else if (joint.equals(ShoulderRoll)){
+            maxRadians = 1.64061F;
+            maxMovement = 5F;
+        } else if (joint.equals(ShoulderPitch)){
+            maxRadians = 2*2.0857F;
+            maxMovement = 6.0F;
         }
 
         if (Math.abs(movement) > maxMovement){

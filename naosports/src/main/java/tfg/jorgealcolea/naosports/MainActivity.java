@@ -31,7 +31,6 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
-import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
@@ -145,12 +144,12 @@ public class MainActivity extends AppCompatActivity implements
         initiazeVideo();
         initiazeTimer();
         initializeButtons();
-        unRegisterHeadMovementManager();
+        unRegisterdMovementManager();
     }
 
     @Override
     protected void onPause(){
-        unRegisterHeadMovementManager();
+        unRegisterdMovementManager();
         RobotSession.getInstance().unRegisterBallTracker();
         LocalBroadcastManager.getInstance(this).unregisterReceiver(mScoreBroadcastReceiver);
         super.onPause();
@@ -160,8 +159,8 @@ public class MainActivity extends AppCompatActivity implements
     protected void onResume(){
         super.onResume();
         if (RobotSession.getInstance().isAlMotion()){
-            if (headToggle.isChecked())
-                registerHeadMovementManager();
+            if (headToggle.isChecked() || armToggle.isChecked())
+                registerdMovementManager();
             if(ballTrackerToggle.isChecked()){
                 RobotSession.getInstance().registerBallTracker();
             }
@@ -328,8 +327,9 @@ public class MainActivity extends AppCompatActivity implements
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
                     headToggle.setChecked(false);
-                } else {
-
+                    registerdMovementManager();
+                } else if (!armToggle.isChecked() && !headToggle.isChecked()){
+                    unRegisterdMovementManager();
                 }
             }
         });
@@ -339,9 +339,9 @@ public class MainActivity extends AppCompatActivity implements
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
                     armToggle.setChecked(false);
-                    registerHeadMovementManager();
-                } else {
-                    unRegisterHeadMovementManager();
+                    registerdMovementManager();
+                } else if (!armToggle.isChecked() && !headToggle.isChecked()){
+                    unRegisterdMovementManager();
                 }
             }
         });
@@ -403,14 +403,14 @@ public class MainActivity extends AppCompatActivity implements
 
     ////////////////////
     //
-    // Head Movement manager
+    // Movement manager
     //
     ////////////////////
-    public void registerHeadMovementManager() {
+    public void registerdMovementManager() {
         mgr.registerListener(this, mgr.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION), SensorManager.SENSOR_DELAY_NORMAL);
     }
 
-    public void unRegisterHeadMovementManager(){
+    public void unRegisterdMovementManager(){
         mgr.unregisterListener(this);
     }
 
@@ -432,8 +432,13 @@ public class MainActivity extends AppCompatActivity implements
         Thread routine = new Thread(new Runnable() {
             @Override
             public void run() {
-                RobotSession.getInstance().moveHead(RobotSession.getInstance().HeadYaw, movementX);
-                RobotSession.getInstance().moveHead(RobotSession.getInstance().HeadPitch, movementY);
+                if (headToggle.isChecked()){
+                    RobotSession.getInstance().moveWithAccelerometer(RobotSession.getInstance().HeadYaw, movementX);
+                    RobotSession.getInstance().moveWithAccelerometer(RobotSession.getInstance().HeadPitch, movementY);
+                } else if (armToggle.isChecked()){
+                    RobotSession.getInstance().moveWithAccelerometer(RobotSession.getInstance().ShoulderRoll, movementX);
+                    RobotSession.getInstance().moveWithAccelerometer(RobotSession.getInstance().ShoulderPitch, movementY);
+                }
             }
         });
         routine.start();

@@ -517,11 +517,6 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.action_score:
-                setContentFragment(new ScoreListFragment());
-                showButtons(View.GONE);
-                scoreTable.setVisibility(View.VISIBLE);
-                return true;
             case R.id.action_reconnect:
                 progress = ProgressDialog.show(context, null, "Reconnecting to robot", true);
                 Thread routine = new Thread(new Runnable() {

@@ -46,6 +46,7 @@ public class ConnectActivity extends AppCompatActivity {
     private ToggleButton toggleMode;
     private Button buttonPlay;
     private Button buttonScore;
+    private Button buttonExit;
     private Spinner timeSpinner;
     private FrameLayout scoreTable;
 
@@ -61,6 +62,7 @@ public class ConnectActivity extends AppCompatActivity {
         layoutRivalName = (LinearLayout)findViewById(R.id.layout_rival_name);
         buttonPlay = (Button)findViewById(R.id.button_play);
         buttonScore = (Button)findViewById(R.id.button_score);
+        buttonExit = (Button)findViewById(R.id.button_exit);
         editTextPlayerName = (EditText)findViewById(R.id.edittext_player_name);
         editTextIp = (EditText)findViewById(R.id.edittext_ip);
         editTextRivalName = (EditText)findViewById(R.id.edittext_rival_name);
@@ -85,7 +87,7 @@ public class ConnectActivity extends AppCompatActivity {
                     // TODO manejar el modo versus
 
                     if (MyGcmManager.getInstance().getRegisteredInGCM()) {
-                        if (toggleMode.isChecked()){
+                        if (toggleMode.isChecked()) {
                             progress = ProgressDialog.show(context, null, "Connecting to robot and waiting for rival to start", true);
                         } else {
                             progress = ProgressDialog.show(context, null, "Connecting to robot", true);
@@ -105,11 +107,19 @@ public class ConnectActivity extends AppCompatActivity {
             public void onClick(View v) {
                 buttonPlay.setVisibility(View.GONE);
                 buttonScore.setVisibility(View.GONE);
+                buttonExit.setVisibility(View.GONE);
                 setContentFragment();
                 scoreTable.setVisibility(View.VISIBLE);
             }
         });
         initializeReceiver();
+
+        buttonExit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
 
         // Register in GCM
         MyGcmManager.getInstance().registerGCM(this, true);
@@ -120,6 +130,7 @@ public class ConnectActivity extends AppCompatActivity {
             scoreTable.setVisibility(View.GONE);
             buttonPlay.setVisibility(View.VISIBLE);
             buttonScore.setVisibility(View.VISIBLE);
+            buttonExit.setVisibility(View.VISIBLE);
         } else {
             super.onBackPressed();
         }
